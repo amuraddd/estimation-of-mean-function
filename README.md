@@ -28,8 +28,9 @@
     - even though as the image changes the pixels in the image change - the coordinates will remain the same for each pixel.
 -------------------------------------------------------------
 # Model
-## Deep Neural Network with 2 layers  
-<img src="model.png">Model Architecture</img>
+## Deep Neural Network with 2 layers
+### Model Architecture  
+<img src="model.png"></img>
 
 ### Current Model Hyperparameters  
 - Layers: 2
