@@ -8,12 +8,12 @@
 - Each image slice is a 95x79 matrix.
 - Each row of the matrix is the output vector which needs to be predicted. These are the individual pixels in the image.
 - To predict the output we need to generate the features which are the coordinates of each pixel in the output vector.
-- The coordinates need to be normalized to 1 so for each coordinate needs to be divided by the $L_0$ norm of the vector.
-    - Example: for the first pixel the coordinates will be $(\frac{1}{95},\frac{1}{79})$ and for the last pixel the coordinates will be $(\frac{1}{95}, \frac{79}{79})$
+- The coordinates need to be normalized to 1 so for each coordinate needs to be divided by the L_0 norm of the vector.
+    - Example: for the first pixel the coordinates will be (1/95, 1/79) and for the last pixel the coordinates will be (1/95, 79/79)
 -------------------------------------------------------
 
 # Model input and output
-## Input: a set of coordinates e.g. $$(\frac{1}{95},\frac{1}{79})$$
+## Input: a set of coordinates e.g. (1/95, 1/79)
 
 ### X:
 - Get all the first coordinates as first column of the input matrix
