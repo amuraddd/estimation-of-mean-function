@@ -1,0 +1,1 @@
+# Estimation of the Mean Function of Functional Data via Deep Neural Networks
