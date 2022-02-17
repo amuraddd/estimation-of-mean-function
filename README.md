@@ -15,7 +15,7 @@
 # Model input and output
 ## Input: a set of coordinates e.g. 
 ```math 
-(\frac{1}{95},\frac{1}{79})
+$(\frac{1}{95},\frac{1}{79})$
 ```
 
 ### X:
