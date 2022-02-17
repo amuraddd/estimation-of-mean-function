@@ -26,3 +26,20 @@
     - example: for an image with dimensions 95x79 - the total number of coordinate sets should be 95*79
     - the number of coordinates should be exactly the same as the number of pixels in the image - this will give a 1:1 correspondence between coordinates and pixels
     - even though as the image changes the pixels in the image change - the coordinates will remain the same for each pixel.
+-------------------------------------------------------------
+# Model
+## Deep Neural Network with 2 layers  
+<img src="model.png">Model Architecture</img>
+
+### Current Model Hyperparameters  
+- Layers: 2
+- Neurons per layer: 1000
+- Loss Function: Huber
+- Number of Epochs: 1000
+- Batch Size: 10
+- Dropout rate: 0.25
+- Activation layer 1: ReLU
+- Activation layer 2: ReLU
+- Optimizer: SGD - gradient descent
+
+### Desired Model Hyperparameters
