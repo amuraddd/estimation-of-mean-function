@@ -13,7 +13,10 @@
 -------------------------------------------------------
 
 # Model input and output
-## Input: a set of coordinates e.g. $(\frac{1}{95},\frac{1}{79})$
+## Input: a set of coordinates e.g. 
+```math 
+(\frac{1}{95},\frac{1}{79})
+```
 
 ### X:
 - Get all the first coordinates as first column of the input matrix
