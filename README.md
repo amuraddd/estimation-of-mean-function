@@ -43,4 +43,19 @@
 - Activation layer 2: ReLU
 - Optimizer: SGD - gradient descent
 
-### Desired Model Hyperparameters
+### Desired Model Hyperparameters - ADNI PET Analysis
+- Layers: 3
+- Neurons per layer: 1000
+- Loss Function: Euclidean
+- Number of Epochs: 300 or 500
+- Batch Size: 32 or 64
+- Sparsity: L_1
+- Activation layer 1: ReLU
+- Activation layer 2: ReLU
+- Activation layer 2: ReLU
+- Optimizer: Adam
+- Image Dimensions: 79x95 pixels
+
+### Objective
+- Recover the image with higher dimensionality
+  - 512x512 pixels 
