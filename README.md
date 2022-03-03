@@ -30,7 +30,7 @@
 # Model
 ## Deep Neural Network with 2 layers
 ### Model Architecture  
-<img src="model/model.png"></img>
+<img src="models/model.png"></img>
 
 ### Current Model Hyperparameters  
 - Layers: 2
