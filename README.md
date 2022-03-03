@@ -58,4 +58,4 @@
 
 ### Objective
 - Recover the image with higher dimensionality
-  - 512x512 pixels
+  - 225x225 pixels
