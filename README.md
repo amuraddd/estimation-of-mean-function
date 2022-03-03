@@ -30,7 +30,7 @@
 # Model
 ## Deep Neural Network with 2 layers
 ### Model Architecture  
-<img src="model.png"></img>
+<img src="model/model.png"></img>
 
 ### Current Model Hyperparameters  
 - Layers: 2
@@ -58,4 +58,4 @@
 
 ### Objective
 - Recover the image with higher dimensionality
-  - 512x512 pixels 
+  - 512x512 pixels
