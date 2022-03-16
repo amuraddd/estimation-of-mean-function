@@ -3,7 +3,7 @@ import numpy as np
 import nibabel as nib
 from nibabel.testing import data_path
 
-def preprocess_image(img, img_slice=10):
+def preprocess_image(img, img_slice=20):
     """
     Input: 
         img: Image as nii file - data cube with slices for an image
@@ -15,12 +15,12 @@ def preprocess_image(img, img_slice=10):
     images = nib.load(img)
     data = images.get_fdata().T #transpose the original data - it should fit the format 95*79
     
-    Y = data[20].ravel() #flatten the matrix of pixels into a single array
+    Y = data[img_slice].ravel() #flatten the matrix of pixels into a single array
     Y = pd.DataFrame(Y, columns=['pixel_value']) #for the first image
     
     #get the number of rows and columns for the matrix of pixels per image
-    rows = data[20].shape[0] #number of rows
-    cols = data[20].shape[1] #number of columns
+    rows = data[img_slice].shape[0] #number of rows
+    cols = data[img_slice].shape[1] #number of columns
 
     #generate coordinates
     row_indices = list()

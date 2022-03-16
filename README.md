@@ -48,13 +48,25 @@
 - Neurons per layer: 1000
 - Loss Function: Euclidean
 - Number of Epochs: 300 or 500
-- Batch Size: 32 or 64
-- Sparsity: L_1
+- Batch Size: 2 to 8
+- Sparsity: L_1 10^-7
 - Activation layer 1: ReLU
 - Activation layer 2: ReLU
 - Activation layer 2: ReLU
 - Optimizer: Adam
 - Image Dimensions: 79x95 pixels
+
+TODO:
+- Weights to be constrained between (-1, 1)
+- Dropout after each layer - 0.4 or 0.5
+- Average pixel values for a crtain subject given the same slice
+- Either use L1 regularization or Dropout, but don't use them together.
+
+For MSE:
+- L1
+
+For Huber:
+- Dropout
 
 ### Objective
 - Recover the image with higher dimensionality
