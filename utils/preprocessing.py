@@ -3,7 +3,35 @@ import numpy as np
 import nibabel as nib
 from nibabel.testing import data_path
 
-def preprocess_image(img, img_slice=20):
+def get_mean_pixel_values(data_location='images/ADNI_data/*.nii', img_slice=20, num_images_to_use='all', plot_image_slice=True, plot_mean_image_slice=True):
+    """
+    Take in images files. Combine the same slices and return mean pixel values.
+    """
+    pixel_values_by_slice = list()
+    files = glob.glob(data_location)
+    
+    if num_images_to_use=='all':
+        n = len(files)
+    else:
+        n = num_images_to_use
+        
+    for file in glob.glob(data_location)[:n]:
+        images = nib.load(file) #load the data
+        data = images.get_fdata().T #transpose the original data - it should fit the format 95*79
+        if plot_image_slice:
+            plt.imshow((data[img_slice]), cmap='gray')
+            plt.title(file)
+            plt.show()
+        pixel_values_by_slice.append(data[img_slice])
+    
+    mean_pixel_values = np.array(pixel_values_by_slice).mean(axis=0)
+    if plot_mean_image_slice:
+        plt.imshow(mean_pixel_values, cmap='gray')
+        plt.show()
+    mean_pixel_values_flattened = mean_pixel_values.ravel()
+    return mean_pixel_values, mean_pixel_values_flattened
+
+def preprocess_image(data_location='images/ADNI_data/*.nii', img_slice=20, num_images_to_use='all', plot_image_slice=True, plot_mean_image_slice=True):
     """
     Input: 
         img: Image as nii file - data cube with slices for an image
@@ -12,15 +40,14 @@ def preprocess_image(img, img_slice=20):
         X: dataframe with two columns containing X and Y coordinates.
         Y: flattened pixel values
     """
-    images = nib.load(img)
-    data = images.get_fdata().T #transpose the original data - it should fit the format 95*79
+    pixel_values, pixel_values_flattened = get_mean_pixel_values(plot_image_slice=False)
     
-    Y = data[img_slice].ravel() #flatten the matrix of pixels into a single array
-    Y = pd.DataFrame(Y, columns=['pixel_value']) #for the first image
+    # Y = data[img_slice].ravel() #flatten the matrix of pixels into a single array
+    Y = pd.DataFrame(pixel_values_flattened, columns=['pixel_value']) #for the first image
     
     #get the number of rows and columns for the matrix of pixels per image
-    rows = data[img_slice].shape[0] #number of rows
-    cols = data[img_slice].shape[1] #number of columns
+    rows = pixel_values.shape[0] #number of rows
+    cols = pixel_values.shape[1] #number of columns
 
     #generate coordinates
     row_indices = list()
