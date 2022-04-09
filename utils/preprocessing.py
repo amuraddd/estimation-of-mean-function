@@ -1,7 +1,9 @@
+import glob
 import pandas as pd
 import numpy as np
 import nibabel as nib
 from nibabel.testing import data_path
+import matplotlib.pyplot as plt
 
 def get_mean_pixel_values(data_location='images/ADNI_data/*.nii', img_slice=20, num_images_to_use='all', plot_image_slice=True, plot_mean_image_slice=True):
     """
@@ -40,7 +42,11 @@ def preprocess_image(data_location='images/ADNI_data/*.nii', img_slice=20, num_i
         X: dataframe with two columns containing X and Y coordinates.
         Y: flattened pixel values
     """
-    pixel_values, pixel_values_flattened = get_mean_pixel_values(plot_image_slice=False)
+    pixel_values, pixel_values_flattened = get_mean_pixel_values(data_location=data_location,
+                                                                 img_slice=img_slice,
+                                                                 num_images_to_use=num_images_to_use,
+                                                                 plot_image_slice=plot_image_slice,
+                                                                 plot_mean_image_slice=plot_mean_image_slice)
     
     # Y = data[img_slice].ravel() #flatten the matrix of pixels into a single array
     Y = pd.DataFrame(pixel_values_flattened, columns=['pixel_value']) #for the first image
@@ -69,3 +75,38 @@ def preprocess_image(data_location='images/ADNI_data/*.nii', img_slice=20, num_i
     X['Y_coordinate'] = np.array(column_indices)
     
     return X, Y
+
+def high_resolution_coordinates(num_rows=100, num_cols=100):
+    """
+    Input: 
+        num_rows: pixel rows
+        num_cols: pixel cols
+    Return 
+        X: dataframe with two columns containing X and Y coordinates.
+        Y: flattened pixel values
+    """
+    
+    #get the number of rows and columns for the matrix of pixels per image
+    rows = num_rows #number of rows
+    cols = num_cols #number of columns
+
+    #generate coordinates
+    row_indices = list()
+    column_indices = list()
+
+    row_coordinates =  (np.indices(dimensions=(rows, cols))[0]+1)*(1/rows) #add 1 to avoid start from 0 - multiply by 1/cols to notmalize
+    column_coordinates =  (np.indices(dimensions=(rows, cols))[1]+1)*(1/cols) #add 1 to avoid start from 0 - multiply by 1/cols to notmalize
+
+    for row in row_coordinates:
+        for row_index in row:
+            row_indices.append(row_index)
+
+    for row in column_coordinates:
+        for column_index in row:
+            column_indices.append(column_index)
+            
+    X = pd.DataFrame(columns=['X_coordinate', 'Y_coordinate'])
+    X['X_coordinate'] = np.array(row_indices)
+    X['Y_coordinate'] = np.array(column_indices)
+    
+    return X
