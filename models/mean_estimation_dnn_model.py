@@ -3,8 +3,10 @@ import numpy as np
 from itertools import product
 import tensorflow as tf
 from tensorflow import keras
-from tensorflow.keras.layers import (Flatten, BatchNormalization, Activation, Dense, Dropout)
+from tensorflow.keras.layers import (Flatten, Activation, Dense)
 import matplotlib.pyplot as plt
+
+from utils.preprocessing import high_resolution_coordinates
 
 class Callback(tf.keras.callbacks.Callback):
     epoch_controller = 25
@@ -16,22 +18,22 @@ class Callback(tf.keras.callbacks.Callback):
         
 def dnn_model(X_train, 
           Y_train, 
+          num_layers=3,
           neurons_per_layer=1000,
           weight_initializer='standard_normal',
           activation_per_layer='relu',
-          batch_normalization=True,
           epochs=500, 
-          dropout_rate=0.4, 
-          loss='huber', 
-          l1_regularizer=False,
-          batch_size=8,
+          loss='mse', 
+          l1_regularizer=True,
+          l1_penalty=1e-7,
+          batch_size=4,
           verbose=0):
     """
     create and return the desired model
     """
     #regularizer
     if l1_regularizer:
-        regularizer=tf.keras.regularizers.L1(l1=1e-7)
+        regularizer=tf.keras.regularizers.L1(l1=l1_penalty)
     else:
         regularizer=None
         
@@ -43,31 +45,18 @@ def dnn_model(X_train,
         
     # add max norm constraint
     max_norm = tf.keras.constraints.MaxNorm(max_value=2, axis=0)
-    
-    #batch normalization
-    if batch_normalization:
-        normalize_batch=BatchNormalization()
-    else:
-        normalize_batch=tf.keras.layers.Layer(trainable=False)
         
+    #model definition
+    model = keras.models.Sequential()
+    model.add(Flatten(input_shape=X_train.shape[1:]))
+    for n in range(num_layers):
+        model.add(Dense(neurons_per_layer, 
+                        kernel_initializer=initializer, 
+                        kernel_regularizer=regularizer, 
+                        kernel_constraint=max_norm,
+                        activation=activation_per_layer))
+    model.add(Dense(1))
     
-    model = keras.models.Sequential([
-        Flatten(input_shape=X_train.shape[1:]),
-        normalize_batch,
-        Dense(neurons_per_layer, kernel_initializer=initializer, kernel_regularizer=regularizer, kernel_constraint=max_norm),
-        normalize_batch,
-        Activation(activation_per_layer),
-        Dropout(dropout_rate),
-        Dense(neurons_per_layer, kernel_initializer=initializer, kernel_regularizer=regularizer, kernel_constraint=max_norm),
-        normalize_batch,
-        Activation(activation_per_layer),
-        Dropout(dropout_rate),
-        Dense(neurons_per_layer, kernel_initializer=initializer, kernel_regularizer=regularizer, kernel_constraint=max_norm),
-        normalize_batch,
-        Activation(activation_per_layer),
-        Dropout(dropout_rate),
-        Dense(1)
-    ])
             
     #define loss to minimize
     if loss=='huber':
@@ -99,29 +88,44 @@ def train_predict(X, Y, **model_params):
     """
     Train and predict pixel values from the model
     """
-    neurons_per_layer = model_params["neurons_per_layer"] if "neurons_per_layer" in model_params else 100
+    num_layers = model_params["num_layers"] if "num_layers" in model_params else 3
+    neurons_per_layer = model_params["neurons_per_layer"] if "neurons_per_layer" in model_params else 1000
     weight_initializer = model_params["weight_initializer"] if "weight_initializer" in model_params else "standard_normal"
     activation_per_layer = model_params["activation_per_layer"] if "activation_per_layer" in model_params else "relu"
-    batch_normalization = model_params["batch_normalization"] if "batch_normalization" in model_params else True
-    epochs = model_params["epochs"] if "epochs" in model_params else 100
-    dropout_rate = model_params["dropout_rate"] if "dropout_rate" in model_params else 0.25
+    epochs = model_params["epochs"] if "epochs" in model_params else 500
     loss = model_params["loss"] if "loss" in model_params else "mse"
     l1_regularizer = model_params["l1_regularizer"] if "l1_regularizer" in model_params else True
-    batch_size = model_params["batch_size"] if "batch_size" in model_params else 8
+    l1_penalty = model_params["l1_penalty"] if "l1_penalty" in model_params else 1e-7
+    batch_size = model_params["batch_size"] if "batch_size" in model_params else 4
     verbose = model_params["verbose"] if "verbose" in model_params else 0
+    get_high_resolution_image = model_params["get_high_resolution_image"] if "get_high_resolution_image" in model_params else False
+    high_resolution_dimensions = model_params["high_resolution_dimensions"] if "high_resolution_dimensions" in model_params else (95,79)
+    cmap = model_params["cmap"] if "cmap" in model_params else "gray"
+    save_image_location_and_name = model_params["save_image_location_and_name"] if "save_image_location_and_name" else False
     
     model_history, model = dnn_model(X, Y,
+                                     num_layers=num_layers,
                                      neurons_per_layer=neurons_per_layer,
                                      weight_initializer=weight_initializer,
                                      activation_per_layer=activation_per_layer, 
-                                     batch_normalization=batch_normalization,
                                      epochs=epochs, 
-                                     dropout_rate=dropout_rate, 
                                      loss=loss, 
                                      l1_regularizer=l1_regularizer, 
+                                     l1_penalty=l1_penalty,
                                      verbose=verbose)
-    y_pred = model.predict(X)
     
-    # plt.imshow(np.reshape(y_pred, (95, 79)), cmap='gray') #display the recovered image
-    
-    return model, model_history, y_pred
+    if get_high_resolution_image:
+        num_rows, num_cols = high_resolution_dimensions
+        X = high_resolution_coordinates(num_rows=num_rows, num_cols=num_cols)
+        y_pred = model.predict(X)
+        if save_image_location_and_name:
+            plt.imshow(np.reshape(y_pred, (num_rows, num_rows)), cmap=cmap) #display the recovered image
+            plt.savefig(save_image_location_and_name)
+    else:
+        y_pred = model.predict(X)
+        default_dims = (50, 50)
+        if save_image_location_and_name:
+            plt.imshow(np.reshape(y_pred, (default_dims[0], default_dims[1])), cmap=cmap) #display the recovered image
+            plt.savefig(save_image_location_and_name)
+        
+    return model_history, model, y_pred
