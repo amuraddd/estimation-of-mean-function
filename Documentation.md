@@ -7,7 +7,7 @@ the data must follow the same format, and the location containing all images mus
 ### How to run the code below
 To run the code below import the `preprocesing` function from utils and the `train_predict` function from models.  
 
-```
+```python
 from utils.preprocessing import preprocess_image #import the preprocessing function from utils
 from models.mean_estimation_dnn_model import train_predict #import the train_model function from models
 
